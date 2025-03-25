@@ -7,6 +7,9 @@ import { storage } from "../storage";
 const LENDING_LEAF_API_URL = "https://lendingleaf.in/api/create-user/";
 const ACCESS_TOKEN = "d80ab55f5b7538f146d96f171f7eeefb";
 
+// Store applications in memory when API fails
+const applications = new Map<string, any>();
+
 interface LoanFormData {
   userId: string;
   isVerified: boolean;
@@ -128,7 +131,7 @@ export const saveFormStep = async (req: Request, res: Response) => {
         if (apiResponse.data.error && apiResponse.data.error.includes("Table") && apiResponse.data.error.includes("doesn't exist")) {
           console.log("Remote database table doesn't exist. Using local processing instead.");
           // Store the data locally since remote API has database issues
-          // We'll simulate a successful response
+          applications.set(formData.userId, { ...formData });
         } else if (!apiResponse.data.success) {
           return res.status(400).json({
             success: false,
@@ -139,6 +142,8 @@ export const saveFormStep = async (req: Request, res: Response) => {
         console.error("Axios Error:", axiosError);
         // Continue with local processing since API call failed
         console.log("API call failed. Using local processing instead.");
+        // Store the data locally
+        applications.set(formData.userId, { ...formData });
       }
     } catch (apiError) {
       console.error("API Error:", apiError);
@@ -157,6 +162,50 @@ export const saveFormStep = async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       message: "Failed to save form data",
+    });
+  }
+};
+
+/**
+ * Get all applications or a specific application by ID
+ */
+export const getApplications = (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    
+    // If ID is provided, return specific application
+    if (id) {
+      const application = applications.get(id);
+      
+      if (!application) {
+        return res.status(404).json({
+          success: false,
+          message: "Application not found",
+        });
+      }
+      
+      return res.status(200).json({
+        success: true,
+        application,
+      });
+    }
+    
+    // Otherwise return all applications
+    const allApplications = Array.from(applications.entries()).map(([id, data]) => ({
+      id,
+      ...data
+    }));
+    
+    return res.status(200).json({
+      success: true,
+      count: allApplications.length,
+      applications: allApplications,
+    });
+  } catch (error) {
+    console.error("Error retrieving applications:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve applications",
     });
   }
 };
@@ -204,7 +253,8 @@ export const submitApplication = async (req: Request, res: Response) => {
         // Check if the API response contains an error about database table
         if (apiResponse.data.error && apiResponse.data.error.includes("Table") && apiResponse.data.error.includes("doesn't exist")) {
           console.log("Remote database table doesn't exist. Using local processing for final submission.");
-          // We'll continue as if it was successful since the API has database issues
+          // Store the completed application
+          applications.set(formData.userId, { ...formData, isCompleted: true });
         } else if (!apiResponse.data.success) {
           return res.status(400).json({
             success: false,
@@ -215,6 +265,8 @@ export const submitApplication = async (req: Request, res: Response) => {
         console.error("Axios Error:", axiosError);
         // Continue with local processing since API call failed
         console.log("API call failed. Using local processing for final submission.");
+        // Store the completed application
+        applications.set(formData.userId, { ...formData, isCompleted: true });
       }
       
       return res.status(200).json({
