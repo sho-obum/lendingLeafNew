@@ -16,7 +16,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Submit the complete application
   loanRoutes.post("/submit-application", submitApplication);
   
-  // We're not storing applications locally anymore, so these routes are removed
+  
 
   // Register the loan routes
   app.use("/api/loans", loanRoutes);

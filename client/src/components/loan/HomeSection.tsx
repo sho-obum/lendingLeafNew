@@ -1,7 +1,9 @@
 "use client";
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRightIcon, CheckCircleIcon } from "lucide-react";
+import { ArrowRightIcon, CheckCircleIcon, ChevronRight } from "lucide-react";
+import bgImage from "../../assets/images/bgImage2.png";  // Import your background image
+import homePhoto from "../../assets/images/homeLoanBg.png";  // Import your background image
 
 interface HomeSectionProps {
   onApplyClick: () => void;
@@ -9,45 +11,51 @@ interface HomeSectionProps {
 
 const HomeSection: React.FC<HomeSectionProps> = ({ onApplyClick }) => {
   return (
-    <section className="relative bg-gradient-to-r from-green-600 to-blue-500 text-white min-h-screen flex flex-col justify-center">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+    <section
+      className="relative min-h-screen flex flex-col justify-center bg-cover bg-center"
+      style={{ backgroundImage: `url(${bgImage})` }}
+    >
+      <div className="bg-black/50 w-full h-full absolute inset-0"></div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 z-10 ">
+
+        {/* Breadcrumb */}
+        <div className="text-white mb-8 lg:mt-4">
+          <nav className="flex items-center text-sm">
+            <a href="/" className="hover:underline cursor-pointer">Home</a>
+            <ChevronRight size={18} className="mx-2" />
+            <span className="text-gray-300">Home Loan</span>
+          </nav>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-6">
-            <h1 className="font-heading text-4xl md:text-5xl font-bold leading-tight">
-              Make Your Dream Home a Reality with Our Flexible Home Loans
+          <div className="space-y-5 text-white">
+            <h1 className="font-heading text-3xl md:text-4xl font-bold leading-tight">
+              Make Your Dream Home a Reality with LendingLeaf
             </h1>
             <p className="text-lg md:text-xl opacity-90 max-w-lg">
-              Quick approval, competitive interest rates, and hassle-free
-              processing to help you finance your perfect home.
+              Quick approvals, competitive interest rates, and hassle-free processing to help you finance your perfect home.
             </p>
             <div className="space-y-4 pt-4">
               <div className="flex items-start">
                 <CheckCircleIcon className="text-amber-300 mr-3 mt-0.5 h-6 w-6" />
                 <div>
-                  <h3 className="font-medium text-lg">
-                    Competitive Interest Rates
-                  </h3>
-                  <p className="opacity-80">
-                    Starting from 8.25% p.a. with flexible repayment options
-                  </p>
+                  <h3 className="font-medium text-lg">Competitive Interest Rates</h3>
+                  <p className="opacity-80">Starting from 8.25% p.a. with flexible repayment options</p>
                 </div>
               </div>
               <div className="flex items-start">
                 <CheckCircleIcon className="text-amber-300 mr-3 mt-0.5 h-6 w-6" />
                 <div>
                   <h3 className="font-medium text-lg">Quick Approvals</h3>
-                  <p className="opacity-80">
-                    Get in-principle approval within 24 hours
-                  </p>
+                  <p className="opacity-80">Get in-principle approval within 24 hours</p>
                 </div>
               </div>
               <div className="flex items-start">
                 <CheckCircleIcon className="text-amber-300 mr-3 mt-0.5 h-6 w-6" />
                 <div>
                   <h3 className="font-medium text-lg">Minimal Documentation</h3>
-                  <p className="opacity-80">
-                    Simplified process with minimal paperwork
-                  </p>
+                  <p className="opacity-80">Simplified process with minimal paperwork</p>
                 </div>
               </div>
             </div>
@@ -62,7 +70,7 @@ const HomeSection: React.FC<HomeSectionProps> = ({ onApplyClick }) => {
 
           <div className="hidden lg:block">
             <img
-              src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60"
+              src={homePhoto}
               alt="Modern family home"
               className="w-full h-auto rounded-lg shadow-xl"
             />

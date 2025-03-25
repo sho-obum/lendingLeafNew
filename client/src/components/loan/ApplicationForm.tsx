@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AnimatedShinyText } from "@/components/magicui/animated-shiny-text";
 import ProgressBar from "./ProgressBar";
-import ThankYouScreen from "./ThankYouScreen";
+import ThankYouScreen from "./LoanOptionsScreen";
 import axios from "axios";
 import { ArrowLeftIcon, CheckIcon } from "lucide-react";
+import LoanOptionsPage from "./LoanOptionsScreen";
 
 interface ApplicationFormProps {
   userId: string;
@@ -17,7 +18,7 @@ interface FormData {
   userId: string;
   isVerified: boolean;
   formState: number;
-  
+
   // Step 1: Basic Information
   fullName?: string;
   mobileNumber?: string;
@@ -25,36 +26,39 @@ interface FormData {
   reqdloanAmount?: string;
   dateOfBirth?: string;
   residencePincode?: string;
-  
+
   // Step 2: Property Type is captured as propertyType state
   propertyType?: string;
-  
+
   // Step 3: Employment Type is captured as employmentType state
   employmentType?: string;
-  
+
   // Step 4: Employment Details - Salaried
   netMonthlyIncome?: string;
   currentEmployer?: string;
   workEmail?: string;
   yearsOfExperience?: string;
-  
+
   // Step 4: Employment Details - Self Employed Business
   annualTurnover?: string;
   businessType?: string;
   businessPincode?: string;
   yearsInBusiness?: string;
-  
+
   // Step 4: Employment Details - Self Employed Professional
   annualReceipts?: string;
   profession?: string;
   officePincode?: string;
   yearsOfPractice?: string;
-  
+
   // Terms and conditions
   termsAccepted?: boolean;
 }
 
-const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) => {
+const ApplicationForm: React.FC<ApplicationFormProps> = ({
+  userId,
+  onGoHome,
+}) => {
   const [step, setStep] = useState(1);
   const [propertyType, setPropertyType] = useState<string | null>(null);
   const [employmentType, setEmploymentType] = useState<string | null>(null);
@@ -69,12 +73,12 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
 
   useEffect(() => {
     // Update formState whenever step changes
-    setFormData(prev => ({ ...prev, formState: step }));
+    setFormData((prev) => ({ ...prev, formState: step }));
   }, [step]);
 
   const validateStep = () => {
     setErrorMessage(null);
-    
+
     if (step === 1) {
       if (!formData.fullName) {
         setErrorMessage("Full name is required");
@@ -84,7 +88,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
         setErrorMessage("Valid 10-digit mobile number is required");
         return false;
       }
-      if (!formData.email || !formData.email.includes('@')) {
+      if (!formData.email || !formData.email.includes("@")) {
         setErrorMessage("Valid email address is required");
         return false;
       }
@@ -96,7 +100,10 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
         setErrorMessage("Date of birth is required");
         return false;
       }
-      if (!formData.residencePincode || formData.residencePincode.length !== 6) {
+      if (
+        !formData.residencePincode ||
+        formData.residencePincode.length !== 6
+      ) {
         setErrorMessage("Valid 6-digit residence pincode is required");
         return false;
       }
@@ -145,26 +152,26 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
         return false;
       }
     }
-    
+
     return true;
   };
 
   const handleNext = async () => {
     if (!validateStep()) return;
-    
+
     try {
       setIsSubmitting(true);
-      
+
       // Include property type and employment type in form data
       const dataToSubmit = {
         ...formData,
         propertyType: propertyType || undefined,
         employmentType: employmentType || undefined,
       };
-      
+
       // Send data to API
-      const response = await axios.post('/api/loans/save-step', dataToSubmit);
-      
+      const response = await axios.post("/api/loans/save-step", dataToSubmit);
+
       if (response.data.success) {
         if (step < 5) {
           setStep(step + 1);
@@ -197,7 +204,9 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -209,24 +218,29 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
 
   const handleSubmit = async () => {
     if (!validateStep()) return;
-    
+
     try {
       setIsSubmitting(true);
-      
+
       // Include property type and employment type in form data
       const dataToSubmit = {
         ...formData,
         propertyType: propertyType || undefined,
         employmentType: employmentType || undefined,
       };
-      
+
       // Send data to API
-      const response = await axios.post('/api/loans/submit-application', dataToSubmit);
-      
+      const response = await axios.post(
+        "/api/loans/submit-application",
+        dataToSubmit
+      );
+
       if (response.data.success) {
         setIsCompleted(true);
       } else {
-        setErrorMessage(response.data.message || "Failed to submit application");
+        setErrorMessage(
+          response.data.message || "Failed to submit application"
+        );
       }
     } catch (error) {
       console.error("Error submitting application:", error);
@@ -238,7 +252,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
 
   // Display thank you screen when completed
   if (isCompleted) {
-    return <ThankYouScreen applicationId={userId} onGoHome={onGoHome} />;
+    return <LoanOptionsPage onGoHome={onGoHome} />;
   }
 
   return (
@@ -247,23 +261,31 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
         {/* Progress Bar */}
         <div className="p-6 pt-8 md:p-10">
           <ProgressBar currentStep={step} totalSteps={5} />
-          
+
           {/* Step Indicators */}
           <div className="flex justify-between mb-8">
             {[1, 2, 3, 4, 5].map((stepNumber) => (
-              <div 
+              <div
                 key={stepNumber}
-                className={`flex flex-col items-center ${stepNumber > step ? 'opacity-50' : ''}`}
+                className={`flex flex-col items-center ${
+                  stepNumber > step ? "opacity-50" : ""
+                }`}
               >
-                <div 
+                <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 text-sm font-medium
-                    ${stepNumber < step 
-                      ? 'bg-green-500 text-white' 
-                      : stepNumber === step 
-                        ? 'bg-green-500 text-white' 
-                        : 'bg-gray-200 text-gray-700'}`}
+                    ${
+                      stepNumber < step
+                        ? "bg-green-500 text-white"
+                        : stepNumber === step
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-200 text-gray-700"
+                    }`}
                 >
-                  {stepNumber < step ? <CheckIcon className="h-4 w-4" /> : stepNumber}
+                  {stepNumber < step ? (
+                    <CheckIcon className="h-4 w-4" />
+                  ) : (
+                    stepNumber
+                  )}
                 </div>
                 <span className="text-xs text-gray-700">
                   {stepNumber === 1 && "Personal"}
@@ -278,12 +300,9 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
 
           {/* Form Header */}
           <div className="mb-8">
-            <AnimatedShinyText className="text-2xl md:text-3xl font-bold">
+            <AnimatedShinyText className="text-3xl md:text-4xl font-bold ">
               Home Loan Application
             </AnimatedShinyText>
-            <div className="text-sm text-gray-500 mt-2">
-              Application ID: <span className="font-medium">{userId}</span>
-            </div>
           </div>
 
           {/* Error Message */}
@@ -296,7 +315,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
           {/* Step 1: Basic Information */}
           {step === 1 && (
             <>
-              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-black">
+              <h2 className="text-xl md:text-2xl font-bold mb-6 text-black">
                 Personal Information
               </h2>
 
@@ -310,7 +329,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                       type="text"
                       name="fullName"
                       placeholder="Enter your name"
-                      className="w-full border p-3 rounded-lg mt-1 bg-white border-gray-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                      className="w-full border p-3 rounded-lg mt-1 bg-white border-gray-700 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                       value={formData.fullName || ""}
                       onChange={handleInputChange}
                     />
@@ -324,7 +343,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                       type="tel"
                       name="mobileNumber"
                       placeholder="Enter your 10-digit mobile number"
-                      className="w-full border p-3 rounded-lg mt-1 bg-white border-gray-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                      className="w-full border p-3 rounded-lg mt-1 bg-white border-gray-700 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                       value={formData.mobileNumber || ""}
                       onChange={handleInputChange}
                       maxLength={10}
@@ -341,7 +360,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                       type="email"
                       name="email"
                       placeholder="Enter your email"
-                      className="w-full border p-3 rounded-lg mt-1 bg-white border-gray-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                      className="w-full border p-3 rounded-lg mt-1 bg-white border-gray-700 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                       value={formData.email || ""}
                       onChange={handleInputChange}
                     />
@@ -354,7 +373,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                     <input
                       type="date"
                       name="dateOfBirth"
-                      className="w-full border p-3 rounded-lg mt-1 bg-white border-gray-300 text-black focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                      className="w-full border p-3 rounded-lg mt-1 bg-white border-gray-700 text-black focus:border-green-500 focus:ring-1 focus:ring-green-500"
                       value={formData.dateOfBirth || ""}
                       onChange={handleInputChange}
                     />
@@ -374,7 +393,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                         type="text"
                         name="reqdloanAmount"
                         placeholder="Enter loan amount"
-                        className="w-full border p-3 rounded-lg pl-8 mt-1 bg-white border-gray-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                        className="w-full border p-3 rounded-lg pl-8 mt-1 bg-white border-gray-700 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                         value={formData.reqdloanAmount || ""}
                         onChange={handleInputChange}
                       />
@@ -389,7 +408,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                       type="text"
                       name="residencePincode"
                       placeholder="Enter 6-digit pincode"
-                      className="w-full border p-3 rounded-lg mt-1 bg-white border-gray-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                      className="w-full border p-3 rounded-lg mt-1 bg-white border-gray-700 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                       value={formData.residencePincode || ""}
                       onChange={handleInputChange}
                       maxLength={6}
@@ -422,7 +441,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                     className={`border px-6 py-8 rounded-lg transition ${
                       propertyType === type
                         ? "bg-green-500 text-white border-transparent"
-                        : "bg-white text-black hover:bg-green-500 hover:text-white border-gray-300"
+                        : "bg-white text-black hover:bg-green-500 hover:text-white border-gray-700"
                     }`}
                   >
                     {type}
@@ -451,7 +470,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                     className={`border px-6 py-8 rounded-lg transition ${
                       employmentType === type
                         ? "bg-green-500 text-white border-transparent"
-                        : "bg-white text-black hover:bg-green-500 hover:text-white border-gray-300"
+                        : "bg-white text-black hover:bg-green-500 hover:text-white border-gray-700"
                     }`}
                   >
                     {type}
@@ -482,7 +501,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                         type="text"
                         name="netMonthlyIncome"
                         placeholder="Enter monthly income"
-                        className="w-full border p-3 rounded-lg pl-8 bg-white border-gray-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                        className="w-full border p-3 rounded-lg pl-8 bg-white border-gray-700 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                         value={formData.netMonthlyIncome || ""}
                         onChange={handleInputChange}
                       />
@@ -497,7 +516,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                       type="text"
                       name="residencePincode"
                       placeholder="Enter pincode"
-                      className="w-full border p-3 rounded-lg bg-white border-gray-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                      className="w-full border p-3 rounded-lg bg-white border-gray-700 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                       value={formData.residencePincode || ""}
                       onChange={handleInputChange}
                     />
@@ -511,7 +530,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                       type="text"
                       name="currentEmployer"
                       placeholder="Enter employer name"
-                      className="w-full border p-3 rounded-lg bg-white border-gray-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                      className="w-full border p-3 rounded-lg bg-white border-gray-700 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                       value={formData.currentEmployer || ""}
                       onChange={handleInputChange}
                     />
@@ -525,7 +544,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                       type="email"
                       name="workEmail"
                       placeholder="Enter work email address"
-                      className="w-full border p-3 rounded-lg bg-white border-gray-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                      className="w-full border p-3 rounded-lg bg-white border-gray-700 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                       value={formData.workEmail || ""}
                       onChange={handleInputChange}
                     />
@@ -539,7 +558,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                       type="number"
                       name="yearsOfExperience"
                       placeholder="Enter years of experience"
-                      className="w-full border p-3 rounded-lg bg-white border-gray-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                      className="w-full border p-3 rounded-lg bg-white border-gray-700 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                       value={formData.yearsOfExperience || ""}
                       onChange={handleInputChange}
                     />
@@ -561,7 +580,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                         type="text"
                         name="annualTurnover"
                         placeholder="Enter annual turnover"
-                        className="w-full border p-3 rounded-lg pl-8 bg-white border-gray-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                        className="w-full border p-3 rounded-lg pl-8 bg-white border-gray-700 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                         value={formData.annualTurnover || ""}
                         onChange={handleInputChange}
                       />
@@ -576,7 +595,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                       type="text"
                       name="businessType"
                       placeholder="Enter business type"
-                      className="w-full border p-3 rounded-lg bg-white border-gray-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                      className="w-full border p-3 rounded-lg bg-white border-gray-700 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                       value={formData.businessType || ""}
                       onChange={handleInputChange}
                     />
@@ -590,7 +609,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                       type="text"
                       name="businessPincode"
                       placeholder="Enter business pincode"
-                      className="w-full border p-3 rounded-lg bg-white border-gray-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                      className="w-full border p-3 rounded-lg bg-white border-gray-700 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                       value={formData.businessPincode || ""}
                       onChange={handleInputChange}
                     />
@@ -604,7 +623,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                       type="number"
                       name="yearsInBusiness"
                       placeholder="Enter years in business"
-                      className="w-full border p-3 rounded-lg bg-white border-gray-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                      className="w-full border p-3 rounded-lg bg-white border-gray-700 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                       value={formData.yearsInBusiness || ""}
                       onChange={handleInputChange}
                     />
@@ -626,7 +645,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                         type="text"
                         name="annualReceipts"
                         placeholder="Enter annual receipts"
-                        className="w-full border p-3 rounded-lg pl-8 bg-white border-gray-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                        className="w-full border p-3 rounded-lg pl-8 bg-white border-gray-700 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                         value={formData.annualReceipts || ""}
                         onChange={handleInputChange}
                       />
@@ -641,7 +660,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                       type="text"
                       name="profession"
                       placeholder="Enter your profession"
-                      className="w-full border p-3 rounded-lg bg-white border-gray-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                      className="w-full border p-3 rounded-lg bg-white border-gray-700 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                       value={formData.profession || ""}
                       onChange={handleInputChange}
                     />
@@ -655,7 +674,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                       type="text"
                       name="officePincode"
                       placeholder="Enter office pincode"
-                      className="w-full border p-3 rounded-lg bg-white border-gray-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                      className="w-full border p-3 rounded-lg bg-white border-gray-700 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                       value={formData.officePincode || ""}
                       onChange={handleInputChange}
                     />
@@ -669,7 +688,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                       type="number"
                       name="yearsOfPractice"
                       placeholder="Enter years of practice"
-                      className="w-full border p-3 rounded-lg bg-white border-gray-300 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                      className="w-full border p-3 rounded-lg bg-white border-gray-700 text-black placeholder:text-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
                       value={formData.yearsOfPractice || ""}
                       onChange={handleInputChange}
                     />
@@ -687,11 +706,15 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
               </h2>
 
               <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
-                <h3 className="font-medium text-lg mb-4">Application Summary</h3>
+                <h3 className="font-medium text-lg mb-4">
+                  Application Summary
+                </h3>
 
                 {/* Personal Information */}
                 <div className="mb-4">
-                  <h4 className="font-medium text-green-700 mb-2">Personal Information</h4>
+                  <h4 className="font-medium text-green-700 mb-2">
+                    Personal Information
+                  </h4>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="text-gray-600">Full Name:</div>
                     <div>{formData.fullName}</div>
@@ -710,7 +733,9 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
 
                 {/* Property Type */}
                 <div className="mb-4">
-                  <h4 className="font-medium text-green-700 mb-2">Property Information</h4>
+                  <h4 className="font-medium text-green-700 mb-2">
+                    Property Information
+                  </h4>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="text-gray-600">Property Type:</div>
                     <div>{propertyType}</div>
@@ -719,11 +744,13 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
 
                 {/* Employment Information */}
                 <div className="mb-4">
-                  <h4 className="font-medium text-green-700 mb-2">Employment Information</h4>
+                  <h4 className="font-medium text-green-700 mb-2">
+                    Employment Information
+                  </h4>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="text-gray-600">Employment Type:</div>
                     <div>{employmentType}</div>
-                    
+
                     {employmentType === "Salaried" && (
                       <>
                         <div className="text-gray-600">Monthly Income:</div>
@@ -732,11 +759,13 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                         <div>{formData.currentEmployer}</div>
                         <div className="text-gray-600">Work Email:</div>
                         <div>{formData.workEmail}</div>
-                        <div className="text-gray-600">Years of Experience:</div>
+                        <div className="text-gray-600">
+                          Years of Experience:
+                        </div>
                         <div>{formData.yearsOfExperience}</div>
                       </>
                     )}
-                    
+
                     {employmentType === "Self Employed Business" && (
                       <>
                         <div className="text-gray-600">Annual Turnover:</div>
@@ -749,7 +778,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
                         <div>{formData.yearsInBusiness}</div>
                       </>
                     )}
-                    
+
                     {employmentType === "Self Employed Professional" && (
                       <>
                         <div className="text-gray-600">Annual Receipts:</div>
@@ -767,18 +796,30 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
               </div>
 
               <div className="flex items-start space-x-3 py-2">
-                <Checkbox 
-                  id="termsAccepted" 
+                <Checkbox
+                  id="termsAccepted"
                   checked={formData.termsAccepted || false}
                   onCheckedChange={handleTermsChange}
                   className="mt-1 h-5 w-5 text-green-500 rounded"
                 />
                 <div>
-                  <label htmlFor="termsAccepted" className="block font-medium text-gray-800">
+                  <label
+                    htmlFor="termsAccepted"
+                    className="block font-medium text-gray-800"
+                  >
                     Terms and Conditions
                   </label>
                   <p className="text-sm text-gray-600 mt-1">
-                    I agree to the <a href="#" className="text-green-600 hover:underline">Terms of Service</a> and <a href="#" className="text-green-600 hover:underline">Privacy Policy</a>. I consent to the processing of my personal information for loan evaluation purposes.
+                    I agree to the{" "}
+                    <a href="#" className="text-green-600 hover:underline">
+                      Terms of Service
+                    </a>{" "}
+                    and{" "}
+                    <a href="#" className="text-green-600 hover:underline">
+                      Privacy Policy
+                    </a>
+                    . I consent to the processing of my personal information for
+                    loan evaluation purposes.
                   </p>
                 </div>
               </div>
@@ -788,30 +829,34 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
           {/* Navigation Buttons */}
           <div className="mt-8 flex justify-between items-center pt-4 border-t border-gray-200">
             {step > 1 ? (
-              <Button 
-                onClick={handleBack} 
+              <Button
+                onClick={handleBack}
                 disabled={isSubmitting}
-                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-100 transition-colors"
+                className="px-6 py-2 border border-gray-700 rounded-lg text-gray-700 font-medium hover:bg-gray-100 transition-colors"
               >
                 <ArrowLeftIcon className="h-4 w-4 mr-2" /> Back
               </Button>
             ) : (
               <div></div>
             )}
-            
+
             {step < 5 ? (
-              <Button 
+              <Button
                 onClick={handleNext}
-                disabled={isSubmitting} 
+                disabled={isSubmitting}
                 className="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
               >
                 {isSubmitting ? "Processing..." : "Next"}
               </Button>
             ) : (
-              <Button 
+              <Button
                 onClick={handleSubmit}
-                disabled={isSubmitting || !formData.termsAccepted} 
-                className={`px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors ${(!formData.termsAccepted || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={isSubmitting || !formData.termsAccepted}
+                className={`px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors ${
+                  !formData.termsAccepted || isSubmitting
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
               >
                 {isSubmitting ? "Processing..." : "Submit Application"}
               </Button>

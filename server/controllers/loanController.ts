@@ -1,9 +1,15 @@
 import { Request, Response } from "express";
 import axios from 'axios';
+import dotenv from "dotenv";
+dotenv.config();
+
 
 // Real API URL 
-const LENDING_LEAF_API_URL = "https://lendingleaf.in/api/create-user/";
-const ACCESS_TOKEN = "d80ab55f5b7538f146d96f171f7eeefb";
+const LENDING_LEAF_API_URL = "https://lendingleaf.in/api/create-user/"
+const ACCESS_TOKEN =  process.env.VITE_ACCESS_TOKEN;
+
+
+// console.log("prcess :", process.env);
 
 interface LoanFormData {
   userId: string;
@@ -173,11 +179,9 @@ export const saveFormStep = async (req: Request, res: Response) => {
   }
 };
 
-// We're not storing applications locally anymore
 
-/**
- * Submit the final application
- */
+
+
 export const submitApplication = async (req: Request, res: Response) => {
   try {
     const formData: LoanFormData = req.body;
