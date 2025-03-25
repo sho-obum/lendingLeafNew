@@ -135,9 +135,13 @@ export const saveFormStep = async (req: Request, res: Response) => {
         
         // Return API response status to the frontend
         if (apiResponse.data.error) {
+          const errorMessage = typeof apiResponse.data.message === 'string' 
+            ? apiResponse.data.message 
+            : 'Unknown API error';
+            
           return res.status(200).json({
             success: true, // Still return success to frontend so form can continue
-            message: "Form data sent to API but there was an API issue: " + apiResponse.data.error,
+            message: "Form data sent to API but there was an API issue: " + errorMessage,
           });
         }
       } catch (axiosError) {
@@ -213,7 +217,11 @@ export const submitApplication = async (req: Request, res: Response) => {
         
         // Return API response status to the frontend
         if (apiResponse.data.error) {
-          console.log("API returned an error but we'll still complete the form flow:", apiResponse.data.error);
+          const errorMessage = typeof apiResponse.data.message === 'string' 
+            ? apiResponse.data.message 
+            : 'Unknown API error';
+            
+          console.log("API returned an error but we'll still complete the form flow:", errorMessage);
           // Still return success to the frontend for a smooth user experience
         } else if (!apiResponse.data.success) {
           // This is when API explicitly returns success: false
