@@ -22,10 +22,21 @@ interface LoanFormData {
 /**
  * Generate a unique ID for the loan application
  */
-export const generateLoanUserId = (req: Request, res: Response) => {
+export const generateLoanUserId = async (req: Request, res: Response) => {
   try {
-    // Generate a unique userId
-    const userId = `LOAN${Date.now().toString().slice(-6)}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    // Generate a unique ID using timestamp, random number, and SHA-256 hash
+    const timestamp = Date.now(); // Current timestamp in milliseconds
+    const randomNum = Math.floor(Math.random() * 100001); // Random number between 0-100000
+    const rawString = `${timestamp}_${randomNum}`;
+    
+    // Hash using SHA-256
+    const encoder = new TextEncoder();
+    const data = encoder.encode(rawString);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    
+    const userId = `user_${hashHex}`;
     
     return res.status(200).json({
       success: true,
