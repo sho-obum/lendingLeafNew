@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import { storage } from "../storage";
 
-// Mock API URL 
+// Real API URL 
 const LENDING_LEAF_API_URL = "https://lendingleaf.in/api/create-user/";
 const ACCESS_TOKEN = "d80ab55f5b7538f146d96f171f7eeefb";
 
@@ -116,12 +116,11 @@ export const saveFormStep = async (req: Request, res: Response) => {
         data: apiData
       };
 
-      // Comment out the actual API call in development if needed
-      // const apiResponse = await axios.request(config);
-      // console.log("API Response:", apiResponse.data);
+      // Make the actual API call
+      const apiResponse = await axios.request(config);
+      console.log("API Response:", apiResponse.data);
       
-      // For now, simulate successful API response
-      const apiResponse = { data: { success: true } };
+      // Use real API response
 
       if (!apiResponse.data.success) {
         return res.status(400).json({
@@ -164,14 +163,47 @@ export const submitApplication = async (req: Request, res: Response) => {
       });
     }
 
-    // Here you would typically finalize the application in your system
-    // and perhaps trigger additional workflows
+    // Send the final submission to the API
+    try {
+      const apiData = {
+        ...formData,
+        isCompleted: true // Mark this as the final submission
+      };
 
-    return res.status(200).json({
-      success: true,
-      message: "Application submitted successfully",
-      applicationId: formData.userId,
-    });
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: LENDING_LEAF_API_URL,
+        headers: { 
+          'ACCESS': ACCESS_TOKEN, 
+          'Content-Type': 'application/json'
+        },
+        data: apiData
+      };
+
+      // Make the actual API call for final submission
+      const apiResponse = await axios.request(config);
+      console.log("Final Submission API Response:", apiResponse.data);
+      
+      if (!apiResponse.data.success) {
+        return res.status(400).json({
+          success: false,
+          message: "Failed to submit final application",
+        });
+      }
+      
+      return res.status(200).json({
+        success: true,
+        message: "Application submitted successfully",
+        applicationId: formData.userId,
+      });
+    } catch (apiError) {
+      console.error("API Error on final submission:", apiError);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to communicate with loan processing service for final submission",
+      });
+    }
   } catch (error) {
     console.error("Error submitting application:", error);
     return res.status(500).json({
