@@ -242,16 +242,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ userId, onGoHome }) =
   }
 
   return (
-    <div className="min-h-screen px-4 md:px-8 pt-16 pb-16 bg-white">
-      {/* Breadcrumb */}
-      <nav className="text-green-600 text-sm mb-8 mt-4">
-        <span className="cursor-pointer hover:underline" onClick={onGoHome}>
-          Home
-        </span>
-        <span className="mx-2"> &gt; </span>
-        <span className="text-green-800 font-bold">Home Loan</span>
-      </nav>
-
+    <div className="min-h-screen px-4 md:px-8 py-16 bg-white">
       <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg">
         {/* Progress Bar */}
         <div className="p-6 pt-8 md:p-10">
