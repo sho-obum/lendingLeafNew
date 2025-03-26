@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "../ui/button.jsx";
 import { ArrowRightIcon, CheckCircleIcon, ChevronRight } from "lucide-react";
 import bgImage from "../../assets/images/bgImage2.png";  // Import your background image
 import homePhoto from "../../assets/images/homeLoanBg.png";  // Import your background image

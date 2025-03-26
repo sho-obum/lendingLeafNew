@@ -252,7 +252,9 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
 
   // Display thank you screen when completed
   if (isCompleted) {
-    return <LoanOptionsPage />;
+    return <LoanOptionsPage onGoHome={function (): void {
+      throw new Error("Function not implemented.");
+    } } applicationLoanId={""} />;
   }
 
   return (

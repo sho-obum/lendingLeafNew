@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 // Real API URL
-const LENDING_LEAF_API_URL = "https://lendingleaf.in/api/create-user/";
+const LENDING_LEAF_API_URL = "https://loan.lendingleaf.in/api/create-user/";
 const ACCESS_TOKEN = process.env.VITE_ACCESS_TOKEN;
 
 interface LoanFormData {
