@@ -1,12 +1,11 @@
 import express, { type Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
 import {
   generateLoanUserId,
   generateLoanTrackUserId,
   saveFormStep,
   submitApplication,
-} from "./controllers/loanController";
+} from "./controllers/loanController.js";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Loan application routes

@@ -1,17 +1,17 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { AnimatedShinyText } from "@/components/magicui/animated-shiny-text";
-import ProgressBar from "./ProgressBar";
-import ThankYouScreen from "./LoanOptionsScreen";
+import { Button } from "../ui/button.jsx";
+import { Checkbox } from "../ui/checkbox.jsx";
+import { AnimatedShinyText } from "../magicui/animated-shiny-text.jsx";
+import ProgressBar from "../loan/ProgressBar.jsx";
+import ThankYouScreen from "../loan/LoanOptionsScreen.jsx";
 import axios from "axios";
 import { ArrowLeftIcon, CheckIcon } from "lucide-react";
-import LoanOptionsPage from "./LoanOptionsScreen";
+import LoanOptionsPage from "../loan/LoanOptionsScreen.jsx";
 
 interface ApplicationFormProps {
   userId: string;
-  onGoHome: () => void;
+  // onGoHome: () => void;
 }
 
 interface FormData {
@@ -57,7 +57,7 @@ interface FormData {
 
 const ApplicationForm: React.FC<ApplicationFormProps> = ({
   userId,
-  onGoHome,
+  // onGoHome,
 }) => {
   const [step, setStep] = useState(1);
   const [propertyType, setPropertyType] = useState<string | null>(null);
@@ -252,7 +252,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
 
   // Display thank you screen when completed
   if (isCompleted) {
-    return <LoanOptionsPage onGoHome={onGoHome} />;
+    return <LoanOptionsPage />;
   }
 
   return (
