@@ -1,11 +1,12 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-      "noEmit": false,
-      "outDir": "./dist",
-      "module": "NodeNext",
-      "moduleResolution": "NodeNext"
+    "noEmit": false,
+    "outDir": "./dist",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "client/api"       // <-- Add this line
   },
-  "include": ["server/**/*"],
-  "exclude": ["client/**/*", "node_modules"]
+  "include": ["client/api/**/*"],  // <-- Updated to reflect your API folder
+  "exclude": ["client/src/**/*", "node_modules"]
 }
