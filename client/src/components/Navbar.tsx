@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "../components/ui/button.jsx";
 import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Logo from "../assets/images/LogoLL.png";

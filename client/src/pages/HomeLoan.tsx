@@ -1,9 +1,9 @@
 "use client";
 import React, { useState } from "react";
-import HomeSection from "@/components/loan/HomeSection";
-import ApplicationForm from "@/components/loan/ApplicationForm";
+import HomeSection from "../components/loan/HomeSection.jsx";
+import ApplicationForm from "../components/loan/ApplicationForm.jsx";
 import axios from "axios";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "../hooks/use-toast.js";
 
 const HomeLoan: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
@@ -63,6 +63,8 @@ const HomeLoan: React.FC = () => {
           <ApplicationForm userId={userId} onGoHome={handleGoHome} />
         </div>
       )}
+
+      
     </div>
   );
 };

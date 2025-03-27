@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import { Button } from "../components/ui/button.jsx";
 import { useLocation } from "wouter";  // Import useLocation hook
 import bgImage from "../assets/images/bgImage.png";  // Import your background image
 

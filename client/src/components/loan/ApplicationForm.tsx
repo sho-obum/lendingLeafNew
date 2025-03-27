@@ -11,7 +11,7 @@ import LoanOptionsPage from "../loan/LoanOptionsScreen.jsx";
 
 interface ApplicationFormProps {
   userId: string;
-  // onGoHome: () => void;
+  onGoHome: () => void;
 }
 
 interface FormData {
