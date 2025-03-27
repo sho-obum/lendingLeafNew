@@ -2,16 +2,20 @@
   "version": 2,
   "builds": [
     {
-      "src": "client/dist/index.html",
-      "use": "@vercel/static"
+      "src": "client/api/index.ts",
+      "use": "@vercel/node"
     },
     {
-      "src": "server/index.ts",
-      "use": "@vercel/node"
+      "src": "client/src/**/*",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "server/index.ts" },
-    { "src": "/(.*)", "dest": "client/dist/index.html" }
-  ]
+    { "src": "/api/.*", "dest": "/api/index.ts" },
+    { "src": "/(.*)", "dest": "/client/src/index.html" }
+  ],
+  "env": {
+    "LENDING_LEAF_API_URL": "https://loan.lendingleaf.in/api/create-user/",
+    "VITE_ACCESS_TOKEN": "YOUR_ACCESS_TOKEN"
+  }
 }
